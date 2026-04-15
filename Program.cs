@@ -79,7 +79,6 @@ static class Program
         var command = args.Length > 0 ? args[0].ToLowerInvariant() : null;
         if (command == "restore" || command == "save")
         {
-            var baseDir = PathHelper.GetBaseDir();
             var aId     = Environment.GetEnvironmentVariable(EnvKeys["APP_UUID"]);
             var cId     = Environment.GetEnvironmentVariable(EnvKeys["CLIENT_UUID"]);
 
@@ -95,7 +94,7 @@ static class Program
                 Environment.Exit(1);
             }
 
-            var rd     = Path.Combine(baseDir, "profiles");
+            var rd     = Path.Combine(PathHelper.GetAppDataDir(), "profiles");
             var appDir = Path.Combine(rd, aId!);
             var client = Path.Combine(appDir, cId!);
 
@@ -119,7 +118,7 @@ static class Program
         }
 
         var apolloCfg = ApolloConfigPathSelector.GetApolloConfigPath();
-        var profilesDir = Path.Combine(PathHelper.GetBaseDir(), "profiles");
+        var profilesDir = Path.Combine(PathHelper.GetAppDataDir(), "profiles");
 
         var preselect = Environment.GetEnvironmentVariable(EnvKeys["APP_UUID"]);
         Application.Run(new ProfileManagerGUI(apolloCfg, profilesDir, preselect));

@@ -7,7 +7,7 @@ namespace ApolloProfileManager;
 public static class ApolloConfigPathSelector
 {
     private static readonly string ConfigIni =
-        Path.Combine(PathHelper.GetBaseDir(), "config.ini");
+        Path.Combine(PathHelper.GetAppDataDir(), "config.ini");
 
     public static string ConfigIniPath => ConfigIni;
 

@@ -13,6 +13,16 @@ public static class PathHelper
     }
 
     /// <summary>
+    /// Returns %LOCALAPPDATA%\ApolloProfileManager — the persistent user-data directory
+    /// used for profiles and config, independent of where the executable lives.
+    /// </summary>
+    public static string GetAppDataDir()
+    {
+        var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        return Path.Combine(localAppData, "ApolloProfileManager");
+    }
+
+    /// <summary>
     /// Converts an absolute path to a relative form by stripping root/drive,
     /// matching Python's make_rel() behavior.
     /// </summary>

@@ -33,9 +33,17 @@ All source files live **at the repository root** — there is no `src/` subdirec
 
 ## Key Design Decisions
 
+### Data Directory
+User-persistent data lives in **`%LOCALAPPDATA%\ApolloProfileManager\`** (via `PathHelper.GetAppDataDir()`), not next to the executable. This means profiles and config survive rebuilds, reinstalls, or moving the exe.
+
+- `config.ini` → `%LOCALAPPDATA%\ApolloProfileManager\config.ini`
+- profiles → `%LOCALAPPDATA%\ApolloProfileManager\profiles\`
+
+`PathHelper.GetBaseDir()` still exists but is only used if the exe's own location is needed (e.g. resolving the exe path for `--inject-config`).
+
 ### Profile Storage Structure
 ```
-<exe dir>/
+%LOCALAPPDATA%\ApolloProfileManager\
   config.ini               # stores apollo_config_path
   profiles/
     <app-uuid>/
