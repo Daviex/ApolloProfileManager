@@ -112,7 +112,7 @@ public partial class ProfileManagerGUI : Form
             }
         }
 
-        return loaded;
+        return loaded.OrderBy(a => a.Item2, StringComparer.OrdinalIgnoreCase).ToList();
     }
 
     private string GetAppsJsonFilename()
