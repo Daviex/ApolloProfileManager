@@ -57,11 +57,14 @@ static class Program
             }
             try
             {
-                ApolloConfigHelper.InjectPrepCommands(apolloPath);
+                bool injected = ApolloConfigHelper.InjectPrepCommands(apolloPath);
                 ApplicationConfiguration.Initialize();
                 MessageBox.Show(
-                    "Prep commands injected successfully. Please restart Apollo to take effect.",
-                    "Apollo config", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    injected
+                        ? "Prep commands injected successfully. Please restart Apollo to take effect."
+                        : "Prep commands for this executable are already present in the Apollo config. No changes were made.",
+                    "Apollo config", MessageBoxButtons.OK,
+                    injected ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
                 Environment.Exit(0);
             }
             catch (Exception ex)

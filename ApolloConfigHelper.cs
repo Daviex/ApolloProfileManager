@@ -62,7 +62,11 @@ public static class ApolloConfigHelper
     /// Injects do/undo prep commands into sunshine.conf global_prep_cmd JSON array.
     /// Matching Python inject_prep_commands().
     /// </summary>
-    public static void InjectPrepCommands(string apolloCfgPath)
+    /// <summary>
+    /// Injects do/undo prep commands into sunshine.conf global_prep_cmd JSON array.
+    /// Returns true if commands were injected, false if identical commands already exist.
+    /// </summary>
+    public static bool InjectPrepCommands(string apolloCfgPath)
     {
         var text = File.ReadAllText(apolloCfgPath, Encoding.UTF8);
         var cfg = ParseApolloConfig(apolloCfgPath);
@@ -79,11 +83,23 @@ public static class ApolloConfigHelper
         }
 
         var exePath = $"\"{(Environment.ProcessPath ?? Process.GetCurrentProcess().MainModule!.FileName)}\"";
+        var doCmd   = $"{exePath} restore";
+        var undoCmd = $"{exePath} save";
+
+        // Check if an identical entry already exists.
+        foreach (var item in gpList)
+        {
+            var obj = item?.AsObject();
+            if (obj == null) continue;
+            if (obj["do"]?.GetValue<string>()   == doCmd &&
+                obj["undo"]?.GetValue<string>() == undoCmd)
+                return false;
+        }
 
         var newEntry = new JsonObject
         {
-            ["do"] = $"{exePath} restore",
-            ["undo"] = $"{exePath} save",
+            ["do"]       = doCmd,
+            ["undo"]     = undoCmd,
             ["elevated"] = true,
         };
 
@@ -114,6 +130,7 @@ public static class ApolloConfigHelper
             sb.AppendLine($"global_prep_cmd = {gpList.ToJsonString()}");
 
         File.WriteAllText(apolloCfgPath, sb.ToString(), Encoding.UTF8);
+        return true;
     }
 
     /// <summary>
@@ -135,7 +152,14 @@ public static class ApolloConfigHelper
 
         try
         {
-            InjectPrepCommands(apolloCfgPath);
+            bool injected = InjectPrepCommands(apolloCfgPath);
+            if (!injected)
+            {
+                MessageBox.Show(owner,
+                    "Prep commands for this executable are already present in the Apollo config. No changes were made.",
+                    "Apollo Config", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return true;
+            }
             MessageBox.Show(owner,
                 "Prep commands injected successfully. Please restart Apollo to take effect.",
                 "Apollo Config", MessageBoxButtons.OK, MessageBoxIcon.Information);
