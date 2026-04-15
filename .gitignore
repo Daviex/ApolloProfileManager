@@ -9,3 +9,6 @@ __pycache__
 *.zip
 config.ini
 *.log
+/csharp/ApolloProfileManager/bin
+/csharp/ApolloProfileManager/obj
+/csharp/ApolloProfileManager/.vs
