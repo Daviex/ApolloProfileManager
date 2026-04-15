@@ -17,9 +17,24 @@ You can find the pre-built binary in [Releases](https://github.com/ClassicOldSon
 ## Usage
 
 1. Run `manager.exe`.
-2. When prompted, select your Apollo configuration file (typically `sunshine.conf`).
-3. After the main application window appears, you can add files that you want the manager to track via the **Edit Paths** button.
-4. Click **Inject Prep Commands** to automatically register the save/restore hooks in your Apollo config.
+2. On first launch, select your Apollo configuration file (typically `sunshine.conf`). The app will check if its prep commands are already registered and offer to inject them.
+3. After the main window appears, select a game from the list and use the buttons on the right:
+   - **Edit Tracked Files** — add/remove files and folders the manager will swap per client.
+   - **Manage Client Saves** — inspect or delete saves for individual clients.
+   - **Open Profile Dir** — open the profile folder in Explorer.
+   - **Inject Global Prep Commands** — register (or verify) the save/restore hooks in Apollo. If the commands are already present a warning is shown and no changes are made.
+   - **Change Apollo Config File** — point the app at a different `sunshine.conf`.
+   - **Change Profiles Directory** — override where profiles are stored (default: `%LOCALAPPDATA%\ApolloProfileManager\profiles`). The setting is saved in `config.ini` and takes effect immediately.
+
+## Data Storage
+
+All user data is stored in `%LOCALAPPDATA%\ApolloProfileManager\` so it persists across updates, reinstalls, or moving the executable:
+
+| Path | Contents |
+|---|---|
+| `config.ini` | Apollo config path and optional settings overrides |
+| `profiles\<app-uuid>\` | Per-game profile data and tracked-path list |
+| `profiles\<app-uuid>\<client-uuid>\` | Per-client saved files/folders |
 
 ## Prerequisites
 
@@ -54,7 +69,7 @@ Apollo Profile Manager hooks into Apollo's `global_prep_cmd` mechanism:
 - **`manager.exe restore`** — called by Apollo before a session starts; swaps in the client's saved profile.
 - **`manager.exe save`** — called by Apollo after a session ends; saves the current state back to the client's profile.
 
-Profiles are stored in a `profiles\` directory next to `manager.exe`, organised by app UUID and client UUID.
+Profiles are stored in `%LOCALAPPDATA%\ApolloProfileManager\profiles\` by default, organised by app UUID and client UUID. The location can be changed from within the app via **Change Profiles Directory**.
 
 ## License
 

@@ -1,5 +1,8 @@
 # Copilot Instructions — Apollo Profile Manager
 
+> [!IMPORTANT]
+> **After every code change, you must update both `README.md` and this file** to reflect what changed. No PR or task is complete until the docs are in sync with the code.
+
 ## What This Project Is
 
 A **Windows-only WinForms app** (C# / .NET 10) that hooks into [Apollo](https://github.com/ClassicOldSong/Apollo) (a game-streaming host) to automatically swap per-client game saves, config files and mod sets when a streaming session starts and ends.
@@ -15,13 +18,13 @@ All source files live **at the repository root** — there is no `src/` subdirec
 | File | Purpose |
 |---|---|
 | `Program.cs` | Entry point. Dispatches CLI commands (`restore`, `save`), hidden flags (`--show-error-dialog`, `--inject-config`), and GUI mode. |
-| `ProfileManagerGUI.cs` / `.Designer.cs` / `.resx` | Main WinForms window. Lists Apollo apps, shows last-run/save metadata, opens sub-dialogs. |
+| `ProfileManagerGUI.cs` / `.Designer.cs` / `.resx` | Main WinForms window. Lists Apollo apps, shows last-run/save metadata, opens sub-dialogs. Buttons: Edit Tracked Files, Manage Client Saves, Open Profile Dir, Delete App Profile, Change Profiles Directory, Inject Global Prep Commands, Change Apollo Config File. |
 | `PathEditorDialog.cs` / `.Designer.cs` / `.resx` | Dialog to add/remove tracked file/folder paths for an app. Supports drag-and-drop. Validates parent/child conflicts. |
 | `ClientManagerDialog.cs` / `.Designer.cs` / `.resx` | Dialog to inspect/delete per-client save directories. |
 | `ProfileEngine.cs` | Core save/restore logic — `DoAction(appDir, clientDir, paths, "restore"\|"save")`. |
-| `ApolloConfigHelper.cs` | Parses `sunshine.conf` (sectionless INI), reads `file_apps` key, injects `global_prep_cmd` entries. |
+| `ApolloConfigHelper.cs` | Parses `sunshine.conf` (sectionless INI), reads `file_apps` key, injects `global_prep_cmd` entries. `InjectPrepCommands()` returns `bool` (true = injected, false = identical entry already present). |
 | `ApolloConfigPathSelector.cs` | Reads/persists Apollo config path in `config.ini`; prompts on first run. |
-| `PathHelper.cs` | `GetBaseDir()`, `MakeRel()`, `Sha1Hex()`, `GetAppPaths()` / `SetAppPaths()`. |
+| `PathHelper.cs` | `GetBaseDir()`, `GetAppDataDir()`, `GetProfilesDir(IniConfig?)`, `MakeRel()`, `Sha1Hex()`, `GetAppPaths()` / `SetAppPaths()`. |
 | `IniHelper.cs` + `IniConfig` | Custom INI read/write (mimics Python `ConfigParser(interpolation=None)`). Keys stored lowercase, UTF-8. |
 | `FileSystemHelper.cs` | `CopyItem()` / `RemoveItem()` — recursive copy/delete, symlink-aware. |
 | `ErrorDialogHelper.cs` | Spawns a detached process with `--show-error-dialog <base64>` to show errors after the main process exits. |
@@ -66,7 +69,7 @@ Paths are keyed by **SHA-1 hex** of the UTF-8 path string (`PathHelper.Sha1Hex`)
 ```json
 {"do": "\"manager.exe\" restore", "undo": "\"manager.exe\" save", "elevated": true}
 ```
-The `--inject-config <path>` hidden flag lets the app re-inject with UAC elevation via `ShellExecute("runas", ...)`.
+Before writing, it checks whether an entry with identical `do` and `undo` values already exists. If so it returns `false` and makes no changes; callers show a warning. The `--inject-config <path>` hidden flag lets the app re-inject with UAC elevation via `ShellExecute("runas", ...)`.
 
 ### Error Dialog Pattern
 When `Program.Main` catches an unhandled exception it calls `ErrorDialogHelper.SpawnErrorDialogAndExitZero()` which:
@@ -103,7 +106,7 @@ No NuGet packages are used — the project has zero external dependencies.
 - **Implicit usings** are enabled; `System`, `System.IO`, `System.Collections.Generic`, `System.Linq`, `System.Windows.Forms` etc. are available without explicit `using` statements.
 - **Nullable** is enabled — use `?` annotations and null-forgiving operators appropriately.
 - All `static` helpers live in `static class` files; only WinForms dialogs are instanced.
-- Designer files (`*.Designer.cs`) are auto-generated — do **not** hand-edit them; use the WinForms designer.
+- Designer files (`*.Designer.cs`) are hand-maintained (no visual designer workflow). Follow the existing pattern when adding controls: declare the field at the bottom, instantiate and configure in `InitializeComponent`, wire events there too.
 - `*.resx` files are auto-generated resource files — do **not** hand-edit them.
 - INI keys are always **lowercase** (enforced by `IniConfig`).
 - Path comparisons use `StringComparer.OrdinalIgnoreCase` (Windows paths are case-insensitive).
