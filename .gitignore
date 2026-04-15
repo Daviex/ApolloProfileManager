@@ -1,14 +1,10 @@
-build
-dist
 profiles
-venv
-.venv
-__pycache__
 .DS_Store
 
 *.zip
 config.ini
 *.log
-/csharp/ApolloProfileManager/bin
-/csharp/ApolloProfileManager/obj
-/csharp/ApolloProfileManager/.vs
+/bin
+/obj
+/.vs
+*.user

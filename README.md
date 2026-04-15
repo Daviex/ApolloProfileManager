@@ -16,58 +16,45 @@ You can find the pre-built binary in [Releases](https://github.com/ClassicOldSon
 
 ## Usage
 
-1.  Run the built binary (e.g., `manager.exe` in the `dist` folder).
-2.  When prompted, select your Apollo configuration file (typically `sunshine.conf`).
-3.  After the main application window appears, you can manually add files that you want the manager to track.
-
-If you're getting "File name too long" error on Windows, follow [this guide](https://docs.python.org/3/using/windows.html#removing-the-max-path-limitation) to enable long file path support:
+1. Run `manager.exe`.
+2. When prompted, select your Apollo configuration file (typically `sunshine.conf`).
+3. After the main application window appears, you can add files that you want the manager to track via the **Edit Paths** button.
+4. Click **Inject Prep Commands** to automatically register the save/restore hooks in your Apollo config.
 
 ## Prerequisites
 
-- Python 3.x
-- pip (Python package installer)
+- Windows 10 or later (x64)
+- [.NET 10 Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) — or use the self-contained build from Releases (no runtime needed)
 
-## Setup
+## Building from Source
 
-1.  **Clone the repository (if you haven't already):**
-    ```bash
-    git clone https://github.com/ClassicOldSong/ApolloProfileManager
-    cd ApolloProfileManager
-    ```
+### Requirements
 
-2.  **Create a virtual environment (recommended):**
-    ```bash
-    python -m venv venv
-    ```
-    Activate the virtual environment:
-    - Windows:
-      ```bash
-      .\venv\Scripts\activate
-      ```
-    - macOS/Linux:
-      ```bash
-      source venv/bin/activate
-      ```
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
+- Visual Studio 2022+ **or** the `dotnet` CLI
 
-3.  **Install dependencies:**
-    Make sure you have a `requirements.txt` file with all necessary packages (including PyInstaller).
-    ```bash
-    pip install -r requirements.txt
-    ```
+### Build with the CLI
 
-## Building the Executable
+```bash
+git clone https://github.com/ClassicOldSong/ApolloProfileManager
+cd ApolloProfileManager
+dotnet publish -c Release
+```
 
-To build a single executable file from the Python script, you can use PyInstaller (which should be installed via `requirements.txt`).
+The self-contained executable will be placed in `bin\Release\net10.0-windows\win-x64\publish\manager.exe`.
 
-1.  **Build the executable:**
-    Navigate to the project's root directory (where `manager.py` is located) in your terminal or command prompt. Then run the following command:
-    ```bash
-    pyinstaller [--onefile] --noconsole manager.py
-    ```
-    -   `--onefile`: Creates a single executable file, but starts slower.
-    -   `--noconsole`: Prevents a console window from appearing when the application runs (use this if your application has a GUI or does not require a console). If it's a command-line application that needs a console, you might use `--console` or omit this flag.
+### Build with Visual Studio
 
-    The executable will be created in a `dist` folder within your project directory.
+Open `ApolloProfileManager.sln`, set the configuration to **Release**, and press **Build → Publish**.
+
+## How It Works
+
+Apollo Profile Manager hooks into Apollo's `global_prep_cmd` mechanism:
+
+- **`manager.exe restore`** — called by Apollo before a session starts; swaps in the client's saved profile.
+- **`manager.exe save`** — called by Apollo after a session ends; saves the current state back to the client's profile.
+
+Profiles are stored in a `profiles\` directory next to `manager.exe`, organised by app UUID and client UUID.
 
 ## License
 
