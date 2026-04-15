@@ -35,6 +35,7 @@ All user data is stored in `%LOCALAPPDATA%\ApolloProfileManager\` so it persists
 | `config.ini` | Apollo config path and optional settings overrides |
 | `profiles\<app-uuid>\` | Per-game profile data and tracked-path list |
 | `profiles\<app-uuid>\<client-uuid>\` | Per-client saved files/folders |
+| `logs\manager-YYYY-MM-DD.log` | Daily log file (all console output with timestamps) |
 
 ## Prerequisites
 
@@ -53,10 +54,15 @@ All user data is stored in `%LOCALAPPDATA%\ApolloProfileManager\` so it persists
 ```bash
 git clone https://github.com/ClassicOldSong/ApolloProfileManager
 cd ApolloProfileManager
+
+# Debug build (multiple files, for development)
+dotnet build
+
+# Self-contained single-file release executable
 dotnet publish -c Release
 ```
 
-The self-contained executable will be placed in `bin\Release\net10.0-windows\win-x64\publish\manager.exe`.
+The self-contained single-file executable will be placed in `bin\Release\net10.0-windows\win-x64\publish\manager.exe` — no separate runtime or additional files required.
 
 ### Build with Visual Studio
 

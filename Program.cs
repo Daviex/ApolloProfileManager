@@ -12,6 +12,7 @@ static class Program
     static void Main(string[] rawArgs)
     {
         ApplicationConfiguration.Initialize();
+        Logger.Initialize();
 
         try
         {
