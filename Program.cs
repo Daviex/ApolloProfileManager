@@ -94,7 +94,8 @@ static class Program
                 Environment.Exit(1);
             }
 
-            var rd     = Path.Combine(PathHelper.GetAppDataDir(), "profiles");
+            var cfg    = IniHelper.LoadConfig(ApolloConfigPathSelector.ConfigIniPath);
+            var rd     = PathHelper.GetProfilesDir(cfg);
             var appDir = Path.Combine(rd, aId!);
             var client = Path.Combine(appDir, cId!);
 
@@ -117,8 +118,9 @@ static class Program
             }
         }
 
-        var apolloCfg = ApolloConfigPathSelector.GetApolloConfigPath();
-        var profilesDir = Path.Combine(PathHelper.GetAppDataDir(), "profiles");
+        var apolloCfg   = ApolloConfigPathSelector.GetApolloConfigPath();
+        var appCfg      = IniHelper.LoadConfig(ApolloConfigPathSelector.ConfigIniPath);
+        var profilesDir = PathHelper.GetProfilesDir(appCfg);
 
         var preselect = Environment.GetEnvironmentVariable(EnvKeys["APP_UUID"]);
         Application.Run(new ProfileManagerGUI(apolloCfg, profilesDir, preselect));

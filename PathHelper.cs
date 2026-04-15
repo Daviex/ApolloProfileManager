@@ -44,8 +44,16 @@ public static class PathHelper
     }
 
     /// <summary>
-    /// Reads profile.ini [paths] section and returns list of (pathString, sha1Hash) tuples.
+    /// Returns the effective profiles directory: the value of [settings] profiles_dir
+    /// in config.ini if set, otherwise the default under GetAppDataDir().
     /// </summary>
+    public static string GetProfilesDir(IniConfig? cfg = null)
+    {
+        var custom = cfg?.Get("settings", "profiles_dir");
+        if (!string.IsNullOrWhiteSpace(custom))
+            return custom;
+        return Path.Combine(GetAppDataDir(), "profiles");
+    }
     public static List<(string PathStr, string HashVal)> GetAppPaths(string appDir)
     {
         var iniPath = Path.Combine(appDir, "profile.ini");

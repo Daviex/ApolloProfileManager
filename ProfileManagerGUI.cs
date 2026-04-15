@@ -5,7 +5,7 @@ namespace ApolloProfileManager;
 public partial class ProfileManagerGUI : Form
 {
     private string _apolloPath;
-    private readonly string _rootDir;
+    private string _rootDir;
     private readonly string? _preselect;
     private List<(string Uid, string Name)> _apps = new();
 
@@ -39,6 +39,7 @@ public partial class ProfileManagerGUI : Form
     private void BtnManage_Click(object? sender, EventArgs e) => ManageClientSaves();
     private void BtnOpen_Click(object? sender, EventArgs e) => OpenAppDir();
     private void BtnDelete_Click(object? sender, EventArgs e) => DeleteApp();
+    private void BtnProfilesDir_Click(object? sender, EventArgs e) => ChangeProfilesDir();
     private void BtnInject_Click(object? sender, EventArgs e) => InjectPrepCommands();
     private void BtnConfig_Click(object? sender, EventArgs e) => ChooseConfig();
 
@@ -253,6 +254,61 @@ public partial class ProfileManagerGUI : Form
         if (!EnsureProfileIni(appDir, name)) return;
         using var dlg = new PathEditorDialog(appDir, name);
         dlg.ShowDialog(this);
+    }
+
+    private void ChangeProfilesDir()
+    {
+        var cfg        = IniHelper.LoadConfig(ApolloConfigPathSelector.ConfigIniPath);
+        var defaultDir = Path.Combine(PathHelper.GetAppDataDir(), "profiles");
+        var current    = PathHelper.GetProfilesDir(cfg);
+
+        var answer = MessageBox.Show(this,
+            $"Current profiles directory:\n{current}\n\n" +
+            "Click Yes to browse for a custom directory.\n" +
+            "Click No to reset to the default location.\n" +
+            "Click Cancel to keep the current setting.",
+            "Change Profiles Directory",
+            MessageBoxButtons.YesNoCancel,
+            MessageBoxIcon.Question);
+
+        if (answer == DialogResult.Cancel) return;
+
+        string newDir;
+        if (answer == DialogResult.Yes)
+        {
+            using var dlg = new FolderBrowserDialog
+            {
+                Description        = "Select the folder where profiles will be stored",
+                UseDescriptionForTitle = true,
+                SelectedPath       = current,
+            };
+            if (dlg.ShowDialog(this) != DialogResult.OK) return;
+            newDir = dlg.SelectedPath;
+        }
+        else
+        {
+            newDir = defaultDir;
+        }
+
+        if (string.Equals(newDir, current, StringComparison.OrdinalIgnoreCase))
+        {
+            MessageBox.Show(this, "No change — the selected directory is already in use.",
+                "Profiles Directory", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return;
+        }
+
+        // Store empty string when the user picks the default so config stays clean.
+        var valueToSave = string.Equals(newDir, defaultDir, StringComparison.OrdinalIgnoreCase)
+            ? string.Empty
+            : newDir;
+        cfg.Set("settings", "profiles_dir", valueToSave);
+        IniHelper.SaveConfig(cfg, ApolloConfigPathSelector.ConfigIniPath);
+
+        _rootDir = newDir;
+        RefreshGames();
+
+        MessageBox.Show(this, $"Profiles directory updated to:\n{newDir}",
+            "Profiles Directory", MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 
     private void InjectPrepCommands()

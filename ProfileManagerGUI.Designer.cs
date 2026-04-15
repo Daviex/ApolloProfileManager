@@ -27,6 +27,7 @@ partial class ProfileManagerGUI
         btnDelete = new System.Windows.Forms.Button();
         btnInject = new System.Windows.Forms.Button();
         btnConfig = new System.Windows.Forms.Button();
+        btnProfilesDir = new System.Windows.Forms.Button();
         ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
         splitContainer1.Panel1.SuspendLayout();
         splitContainer1.Panel2.SuspendLayout();
@@ -47,6 +48,7 @@ partial class ProfileManagerGUI
         splitContainer1.Panel2.Controls.Add(btnManage);
         splitContainer1.Panel2.Controls.Add(btnOpen);
         splitContainer1.Panel2.Controls.Add(btnDelete);
+        splitContainer1.Panel2.Controls.Add(btnProfilesDir);
         splitContainer1.Panel2.Controls.Add(btnInject);
         splitContainer1.Panel2.Controls.Add(btnConfig);
         //
@@ -153,6 +155,17 @@ partial class ProfileManagerGUI
         btnDelete.UseVisualStyleBackColor = true;
         btnDelete.Click += BtnDelete_Click;
         //
+        // btnProfilesDir  (anchored to bottom)
+        //
+        btnProfilesDir.Anchor = System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Bottom;
+        btnProfilesDir.Location = new System.Drawing.Point(5, 262);
+        btnProfilesDir.Name = "btnProfilesDir";
+        btnProfilesDir.Size = new System.Drawing.Size(205, 28);
+        btnProfilesDir.TabIndex = 10;
+        btnProfilesDir.Text = "Change Profiles Directory";
+        btnProfilesDir.UseVisualStyleBackColor = true;
+        btnProfilesDir.Click += BtnProfilesDir_Click;
+        //
         // btnInject  (anchored to bottom)
         //
         btnInject.Anchor = System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Bottom;
@@ -207,4 +220,5 @@ partial class ProfileManagerGUI
     private System.Windows.Forms.Button btnDelete;
     private System.Windows.Forms.Button btnInject;
     private System.Windows.Forms.Button btnConfig;
+    private System.Windows.Forms.Button btnProfilesDir;
 }
