@@ -75,6 +75,8 @@ Apollo Profile Manager hooks into Apollo's `global_prep_cmd` mechanism:
 - **`manager.exe restore`** — called by Apollo before a session starts; swaps in the client's saved profile.
 - **`manager.exe save`** — called by Apollo after a session ends; saves the current state back to the client's profile.
 
+The prep commands are injected **without** `"elevated": true` so that Apollo spawns them via `CreateProcess` and correctly passes the `APOLLO_*` environment variables the app relies on. Elevation is not required because all data lives in `%LOCALAPPDATA%`.
+
 Profiles are stored in `%LOCALAPPDATA%\ApolloProfileManager\profiles\` by default, organised by app UUID and client UUID. The location can be changed from within the app via **Change Profiles Directory**.
 
 ## License

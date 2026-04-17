@@ -83,6 +83,13 @@ static class Program
         var command = args.Length > 0 ? args[0].ToLowerInvariant() : null;
         if (command == "restore" || command == "save")
         {
+            /*
+            Console.WriteLine($"--- Environment variables ({command}) ---");
+            foreach (System.Collections.DictionaryEntry entry in Environment.GetEnvironmentVariables())
+                Console.WriteLine($"  {entry.Key}={entry.Value}");
+            Console.WriteLine("--- End of environment variables ---");
+            */
+
             var aId     = Environment.GetEnvironmentVariable(EnvKeys["APP_UUID"]);
             var cId     = Environment.GetEnvironmentVariable(EnvKeys["CLIENT_UUID"]);
 

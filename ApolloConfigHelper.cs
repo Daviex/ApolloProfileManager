@@ -98,9 +98,8 @@ public static class ApolloConfigHelper
 
         var newEntry = new JsonObject
         {
-            ["do"]       = doCmd,
-            ["undo"]     = undoCmd,
-            ["elevated"] = true,
+            ["do"]   = doCmd,
+            ["undo"] = undoCmd,
         };
 
         // Insert at front
