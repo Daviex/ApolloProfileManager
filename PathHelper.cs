@@ -64,6 +64,25 @@ public static class PathHelper
         return result;
     }
 
+    /// <summary>Reads the [settings] use_zip flag from the app's profile.ini (defaults to true).</summary>
+    public static bool GetUseZip(string appDir)
+    {
+        var iniPath = Path.Combine(appDir, "profile.ini");
+        var cfg = IniHelper.LoadConfig(iniPath, new() { ["settings"] = new() });
+        var val = cfg.Get("settings", "use_zip");
+        if (bool.TryParse(val, out var b)) return b;
+        return true;
+    }
+
+    /// <summary>Sets the [settings] use_zip flag in the app's profile.ini.</summary>
+    public static void SetUseZip(string appDir, bool useZip)
+    {
+        var iniPath = Path.Combine(appDir, "profile.ini");
+        var cfg = IniHelper.LoadConfig(iniPath);
+        cfg.Set("settings", "use_zip", useZip.ToString().ToLowerInvariant());
+        IniHelper.SaveConfig(cfg, iniPath);
+    }
+
     /// <summary>
     /// Writes a list of path strings to profile.ini [paths], keyed by SHA1 hash.
     /// </summary>

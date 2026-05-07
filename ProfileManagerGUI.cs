@@ -42,6 +42,7 @@ public partial class ProfileManagerGUI : Form
     private void BtnProfilesDir_Click(object? sender, EventArgs e) => ChangeProfilesDir();
     private void BtnInject_Click(object? sender, EventArgs e) => InjectPrepCommands();
     private void BtnConfig_Click(object? sender, EventArgs e) => ChooseConfig();
+    private void ChkUseZip_CheckedChanged(object? sender, EventArgs e) => ToggleUseZip();
 
     // ── Game list ─────────────────────────────────────────────────────────────
 
@@ -143,6 +144,7 @@ public partial class ProfileManagerGUI : Form
         if (sel < 0)
         {
             SetSelectionButtons(false);
+            chkUseZip.Enabled = false;
             lblName.Text     = "Name: \u2014";
             lblUuid.Text     = "UUID: \u2014";
             lblLastRun.Text  = "Last run: \u2014 (\u2014)";
@@ -164,12 +166,15 @@ public partial class ProfileManagerGUI : Form
             var lsc = ResolveClientName(uid, cfg.Get("meta", "last_save_client")) ?? "\u2014";
             lblLastRun.Text  = $"Last run: {lr} ({lrc})";
             lblLastSave.Text = $"Last save: {ls} ({lsc})";
+            chkUseZip.Enabled = true;
+            chkUseZip.Checked = PathHelper.GetUseZip(Path.Combine(_rootDir, uid));
             SetSelectionButtons(true);
         }
         else
         {
             lblLastRun.Text  = "Last run: \u2014 (\u2014)";
             lblLastSave.Text = "Last save: \u2014 (\u2014)";
+            chkUseZip.Enabled = false;
             btnManage.Enabled = btnOpen.Enabled = btnDelete.Enabled = false;
         }
         btnEdit.Enabled = true;
@@ -315,6 +320,15 @@ public partial class ProfileManagerGUI : Form
     {
         ApolloConfigHelper.TryInjectPrepCommands(_apolloPath, this);
         RefreshGames();
+    }
+
+    private void ToggleUseZip()
+    {
+        var sel = lstGames.SelectedIndex;
+        if (sel < 0) return;
+        var (uid, _) = _apps[sel];
+        var appDir = Path.Combine(_rootDir, uid);
+        PathHelper.SetUseZip(appDir, chkUseZip.Checked);
     }
 
     private void ChooseConfig()

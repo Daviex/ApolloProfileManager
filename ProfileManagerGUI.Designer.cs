@@ -25,6 +25,7 @@ partial class ProfileManagerGUI
         btnManage = new System.Windows.Forms.Button();
         btnOpen = new System.Windows.Forms.Button();
         btnDelete = new System.Windows.Forms.Button();
+        chkUseZip = new System.Windows.Forms.CheckBox();
         btnInject = new System.Windows.Forms.Button();
         btnConfig = new System.Windows.Forms.Button();
         btnProfilesDir = new System.Windows.Forms.Button();
@@ -48,6 +49,7 @@ partial class ProfileManagerGUI
         splitContainer1.Panel2.Controls.Add(btnManage);
         splitContainer1.Panel2.Controls.Add(btnOpen);
         splitContainer1.Panel2.Controls.Add(btnDelete);
+        splitContainer1.Panel2.Controls.Add(chkUseZip);
         splitContainer1.Panel2.Controls.Add(btnProfilesDir);
         splitContainer1.Panel2.Controls.Add(btnInject);
         splitContainer1.Panel2.Controls.Add(btnConfig);
@@ -155,6 +157,18 @@ partial class ProfileManagerGUI
         btnDelete.UseVisualStyleBackColor = true;
         btnDelete.Click += BtnDelete_Click;
         //
+        // chkUseZip
+        //
+        chkUseZip.AutoSize = true;
+        chkUseZip.Enabled = false;
+        chkUseZip.Location = new System.Drawing.Point(5, 237);
+        chkUseZip.Name = "chkUseZip";
+        chkUseZip.Size = new System.Drawing.Size(102, 19);
+        chkUseZip.TabIndex = 11;
+        chkUseZip.Text = "Use Zip for folders";
+        chkUseZip.UseVisualStyleBackColor = true;
+        chkUseZip.CheckedChanged += ChkUseZip_CheckedChanged;
+        //
         // btnProfilesDir  (anchored to bottom)
         //
         btnProfilesDir.Anchor = System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Bottom;
@@ -208,6 +222,7 @@ partial class ProfileManagerGUI
 
     #endregion
 
+    private System.Windows.Forms.CheckBox chkUseZip;
     private System.Windows.Forms.SplitContainer splitContainer1;
     private System.Windows.Forms.ListBox lstGames;
     private System.Windows.Forms.Label lblName;

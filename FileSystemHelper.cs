@@ -1,3 +1,5 @@
+using System.IO.Compression;
+
 namespace ApolloProfileManager;
 
 public static class FileSystemHelper
@@ -25,19 +27,103 @@ public static class FileSystemHelper
         }
     }
 
-    /// <summary>Recursively copies a directory (equivalent to shutil.copytree with dirs_exist_ok=True).</summary>
+    /// <summary>Recursively copies a directory (equivalent to shutil.copytree with dirs_exist_ok=True, ignore_errors=True).</summary>
     private static void CopyDirectory(string src, string dst)
     {
         Directory.CreateDirectory(dst);
         foreach (var file in Directory.GetFiles(src))
         {
-            var destFile = Path.Combine(dst, Path.GetFileName(file));
-            File.Copy(file, destFile, overwrite: true);
+            try
+            {
+                var destFile = Path.Combine(dst, Path.GetFileName(file));
+                if (File.Exists(destFile))
+                    File.SetAttributes(destFile, FileAttributes.Normal);
+                File.Copy(file, destFile, overwrite: true);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[warn] Failed to copy file '{file}' to '{dst}': {ex.Message}");
+            }
         }
         foreach (var dir in Directory.GetDirectories(src))
         {
-            var destDir = Path.Combine(dst, Path.GetFileName(dir));
-            CopyDirectory(dir, destDir);
+            try
+            {
+                var destDir = Path.Combine(dst, Path.GetFileName(dir));
+                CopyDirectory(dir, destDir);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[warn] Failed to copy directory '{dir}' to '{dst}': {ex.Message}");
+            }
+        }
+    }
+
+    /// <summary>Creates a zip archive from a directory, skipping inaccessible files/dirs.</summary>
+    public static void ZipDirectory(string srcDir, string dstZip)
+    {
+        var parent = Path.GetDirectoryName(dstZip);
+        if (!string.IsNullOrEmpty(parent))
+            Directory.CreateDirectory(parent);
+        using var zip = ZipFile.Open(dstZip, ZipArchiveMode.Create);
+        AddToZip(zip, srcDir, "");
+    }
+
+    private static void AddToZip(ZipArchive zip, string srcDir, string entryPrefix)
+    {
+        foreach (var file in Directory.GetFiles(srcDir))
+        {
+            try
+            {
+                zip.CreateEntryFromFile(file, entryPrefix + Path.GetFileName(file));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[warn] Failed to zip file '{file}': {ex.Message}");
+            }
+        }
+        foreach (var dir in Directory.GetDirectories(srcDir))
+        {
+            try
+            {
+                var dirName = Path.GetFileName(dir);
+                AddToZip(zip, dir, entryPrefix + dirName + "/");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[warn] Failed to zip directory '{dir}': {ex.Message}");
+            }
+        }
+    }
+
+    /// <summary>Extracts a zip archive to a directory, skipping files that can't be written.</summary>
+    public static void UnzipTo(string srcZip, string dstDir)
+    {
+        Directory.CreateDirectory(dstDir);
+        using var zip = ZipFile.OpenRead(srcZip);
+        foreach (var entry in zip.Entries)
+        {
+            try
+            {
+                var destPath = Path.Combine(dstDir, entry.FullName.Replace('/', Path.DirectorySeparatorChar));
+                if (string.IsNullOrEmpty(entry.Name))
+                {
+                    Directory.CreateDirectory(destPath);
+                }
+                else
+                {
+                    var parent = Path.GetDirectoryName(destPath);
+                    if (!string.IsNullOrEmpty(parent))
+                        Directory.CreateDirectory(parent);
+                    if (File.Exists(destPath))
+                        File.SetAttributes(destPath, FileAttributes.Normal);
+                    entry.ExtractToFile(destPath, overwrite: true);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[warn] Failed to extract '{entry.FullName}': {ex.Message}");
+            }
         }
     }
 

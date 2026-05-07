@@ -34,6 +34,7 @@ public static class ProfileEngine
         var clientProfileBase = clientDir;
 
         Directory.CreateDirectory(clientProfileBase);
+        var useZip = PathHelper.GetUseZip(appDir);
 
         if (action == "restore")
         {
@@ -52,8 +53,13 @@ public static class ProfileEngine
                     if (Directory.Exists(realPath))
                     {
                         var container = Path.Combine(backupBase, hash);
+                        var zipContainer = Path.Combine(backupBase, hash + ".zip");
                         FileSystemHelper.RemoveItem(container);
-                        FileSystemHelper.CopyItem(realPath, container);
+                        FileSystemHelper.RemoveItem(zipContainer);
+                        if (useZip)
+                            FileSystemHelper.ZipDirectory(realPath, zipContainer);
+                        else
+                            FileSystemHelper.CopyItem(realPath, container);
                     }
                     else
                     {
@@ -73,8 +79,15 @@ public static class ProfileEngine
 
                 var profileDir  = Path.Combine(clientProfileBase, hash);
                 var profileFile = Path.Combine(clientProfileBase, hash + ext);
+                var profileZip  = Path.Combine(clientProfileBase, hash + ".zip");
 
-                if (Directory.Exists(profileDir))
+                if (File.Exists(profileZip))
+                {
+                    FileSystemHelper.RemoveItem(realPath);
+                    Directory.CreateDirectory(realPath);
+                    FileSystemHelper.UnzipTo(profileZip, realPath);
+                }
+                else if (Directory.Exists(profileDir))
                 {
                     FileSystemHelper.RemoveItem(realPath);
                     Directory.CreateDirectory(realPath);
@@ -117,7 +130,16 @@ public static class ProfileEngine
                     {
                         if (File.Exists(profileFile)) FileSystemHelper.RemoveItem(profileFile);
                         if (Directory.Exists(profileDirContainer)) FileSystemHelper.RemoveItem(profileDirContainer);
-                        FileSystemHelper.CopyItem(realPath, profileDirContainer);
+                        if (useZip)
+                        {
+                            var profileZipPath = Path.Combine(clientProfileBase, hash + ".zip");
+                            if (File.Exists(profileZipPath)) FileSystemHelper.RemoveItem(profileZipPath);
+                            FileSystemHelper.ZipDirectory(realPath, profileZipPath);
+                        }
+                        else
+                        {
+                            FileSystemHelper.CopyItem(realPath, profileDirContainer);
+                        }
                     }
                     else
                     {
@@ -133,8 +155,15 @@ public static class ProfileEngine
                 // Restore from backup to real path
                 var backupDir  = Path.Combine(backupBase, hash);
                 var backupFile = Path.Combine(backupBase, hash + ext);
+                var backupZip  = Path.Combine(backupBase, hash + ".zip");
 
-                if (Directory.Exists(backupDir))
+                if (File.Exists(backupZip))
+                {
+                    FileSystemHelper.RemoveItem(realPath);
+                    Directory.CreateDirectory(realPath);
+                    FileSystemHelper.UnzipTo(backupZip, realPath);
+                }
+                else if (Directory.Exists(backupDir))
                 {
                     FileSystemHelper.RemoveItem(realPath);
                     Directory.CreateDirectory(realPath);
