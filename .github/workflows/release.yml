@@ -1,0 +1,44 @@
+name: Build Release
+
+on:
+  push:
+    branches: [ "master" ]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    env:
+      Solution_Name: ApolloProfileManager.sln
+      Project_Name: ApolloProfileManager.csproj
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+
+    - name: Restore
+      run: dotnet restore $env:Solution_Name
+
+    - name: Publish standalone executable
+      run: dotnet publish $env:Project_Name -c Release -p:PublishProfile=Properties\PublishProfiles\standalone.pubxml
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: build-${{ github.run_id }}
+        name: Build #${{ github.run_number }}
+        body: Automated build from commit `${{ github.sha }}`
+        files: bin/publish/standalone/manager.exe
+        prerelease: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
