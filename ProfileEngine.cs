@@ -7,6 +7,8 @@ public static class ProfileEngine
 {
     private const string BackupPrefix = "__backup_";
     private const string ClientMetaIni = "client.ini";
+    private const string RegistryDirName = "registry";
+    private const string MissingRegistryMarkerExtension = ".missing";
 
     private static readonly Dictionary<string, string> EnvKeys = new()
     {
@@ -18,7 +20,8 @@ public static class ProfileEngine
     };
 
     public static void DoAction(string appDir, string clientDir,
-        List<(string PathStr, string HashVal)> pathsWithHashes, string action)
+        List<(string PathStr, string HashVal)> pathsWithHashes, string action,
+        List<(string KeyPath, string HashVal)>? registryKeysWithHashes = null)
     {
         var appProfile = Path.Combine(appDir, "profile.ini");
         if (!File.Exists(appProfile))
@@ -32,9 +35,12 @@ public static class ProfileEngine
 
         var backupBase        = Path.Combine(appDir, BackupPrefix + clientUuid);
         var clientProfileBase = clientDir;
+        var backupRegistryBase = Path.Combine(backupBase, RegistryDirName);
+        var clientRegistryBase = Path.Combine(clientProfileBase, RegistryDirName);
 
         Directory.CreateDirectory(clientProfileBase);
         var useZip = PathHelper.GetUseZip(appDir);
+        registryKeysWithHashes ??= new();
 
         if (action == "restore")
         {
@@ -69,6 +75,21 @@ public static class ProfileEngine
                         FileSystemHelper.CopyItem(realPath, backupFile);
                     }
                 }
+
+                foreach (var (keyPath, hash) in registryKeysWithHashes)
+                {
+                    var backupRegFile = Path.Combine(backupRegistryBase, hash + ".reg");
+                    var missingMarker = Path.Combine(backupRegistryBase, hash + MissingRegistryMarkerExtension);
+                    FileSystemHelper.RemoveItem(backupRegFile);
+                    FileSystemHelper.RemoveItem(missingMarker);
+
+                    if (RegistryHelper.ExportKey(keyPath, backupRegFile))
+                        continue;
+
+                    Directory.CreateDirectory(backupRegistryBase);
+                    File.WriteAllText(missingMarker, keyPath);
+                    Console.WriteLine($"[warn] Registry key not found during backup: {keyPath}");
+                }
             }
 
             // Step 2: Restore client profile items to real paths
@@ -100,6 +121,15 @@ public static class ProfileEngine
                     if (!string.IsNullOrEmpty(parent)) Directory.CreateDirectory(parent);
                     FileSystemHelper.CopyItem(profileFile, realPath);
                 }
+            }
+
+            foreach (var (keyPath, hash) in registryKeysWithHashes)
+            {
+                var profileRegFile = Path.Combine(clientRegistryBase, hash + ".reg");
+                if (File.Exists(profileRegFile))
+                    RegistryHelper.ImportKeyReplacingCurrent(keyPath, profileRegFile);
+                else
+                    Console.WriteLine($"[warn] Saved registry key not found during restore: {keyPath}");
             }
 
             var now = DateTime.Now.ToString("s"); // ISO 8601 seconds precision
@@ -176,6 +206,26 @@ public static class ProfileEngine
                     if (!string.IsNullOrEmpty(parent)) Directory.CreateDirectory(parent);
                     FileSystemHelper.CopyItem(backupFile, realPath);
                 }
+            }
+
+            foreach (var (keyPath, hash) in registryKeysWithHashes)
+            {
+                var profileRegFile = Path.Combine(clientRegistryBase, hash + ".reg");
+                if (RegistryHelper.ExportKey(keyPath, profileRegFile))
+                {
+                    Console.WriteLine($"Saved registry key: {keyPath}");
+                }
+                else
+                {
+                    Console.WriteLine($"[warn] Registry key missing during save: {keyPath}. Corresponding profile item will not be updated.");
+                }
+
+                var backupRegFile = Path.Combine(backupRegistryBase, hash + ".reg");
+                var missingMarker = Path.Combine(backupRegistryBase, hash + MissingRegistryMarkerExtension);
+                if (File.Exists(backupRegFile))
+                    RegistryHelper.ImportKeyReplacingCurrent(keyPath, backupRegFile);
+                else if (File.Exists(missingMarker))
+                    RegistryHelper.DeleteKey(keyPath);
             }
 
             // Remove entire backup dir for this client

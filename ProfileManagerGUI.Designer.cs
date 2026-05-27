@@ -120,7 +120,7 @@ partial class ProfileManagerGUI
         btnEdit.Name = "btnEdit";
         btnEdit.Size = new System.Drawing.Size(205, 28);
         btnEdit.TabIndex = 4;
-        btnEdit.Text = "Edit Tracked Files";
+        btnEdit.Text = "Edit Tracked Items";
         btnEdit.UseVisualStyleBackColor = true;
         btnEdit.Click += BtnEdit_Click;
         //

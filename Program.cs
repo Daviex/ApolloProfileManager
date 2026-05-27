@@ -110,7 +110,8 @@ static class Program
             var appDir = Path.Combine(rd, aId!);
             var client = Path.Combine(appDir, cId!);
 
-            ProfileEngine.DoAction(appDir, client, PathHelper.GetAppPaths(appDir), command);
+            ProfileEngine.DoAction(appDir, client, PathHelper.GetAppPaths(appDir), command,
+                PathHelper.GetAppRegistryKeys(appDir));
             return;
         }
 

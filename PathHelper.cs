@@ -64,6 +64,16 @@ public static class PathHelper
         return result;
     }
 
+    public static List<(string KeyPath, string HashVal)> GetAppRegistryKeys(string appDir)
+    {
+        var iniPath = Path.Combine(appDir, "profile.ini");
+        var cfg = IniHelper.LoadConfig(iniPath, new() { ["registry"] = new() });
+        var result = new List<(string, string)>();
+        foreach (var (hashVal, keyPath) in cfg["registry"])
+            result.Add((keyPath, hashVal));
+        return result;
+    }
+
     /// <summary>Reads the [settings] use_zip flag from the app's profile.ini (defaults to true).</summary>
     public static bool GetUseZip(string appDir)
     {
@@ -93,6 +103,19 @@ public static class PathHelper
         cfg.ClearSection("paths");
         foreach (var p in paths)
             cfg["paths"][Sha1Hex(p)] = p;
+        IniHelper.SaveConfig(cfg, iniPath);
+    }
+
+    public static void SetAppRegistryKeys(string appDir, IEnumerable<string> keyPaths)
+    {
+        var iniPath = Path.Combine(appDir, "profile.ini");
+        var cfg = IniHelper.LoadConfig(iniPath, new() { ["registry"] = new() });
+        cfg.ClearSection("registry");
+        foreach (var p in keyPaths)
+        {
+            var normalized = RegistryHelper.NormalizeKeyPath(p);
+            cfg["registry"][Sha1Hex(normalized)] = normalized;
+        }
         IniHelper.SaveConfig(cfg, iniPath);
     }
 }

@@ -19,7 +19,7 @@ You can find the pre-built binary in [Releases](https://github.com/ClassicOldSon
 1. Run `manager.exe`.
 2. On first launch, select your Apollo configuration file (typically `sunshine.conf`). The app will check if its prep commands are already registered and offer to inject them.
 3. After the main window appears, select a game from the list and use the buttons on the right:
-   - **Edit Tracked Files** — add/remove files and folders the manager will swap per client.
+   - **Edit Tracked Items** — add/remove files, folders, and registry keys the manager will swap per client.
    - **Manage Client Saves** — inspect or delete saves for individual clients.
    - **Open Profile Dir** — open the profile folder in Explorer.
    - **Inject Global Prep Commands** — register (or verify) the save/restore hooks in Apollo. If the commands are already present a warning is shown and no changes are made.
@@ -33,8 +33,8 @@ All user data is stored in `%LOCALAPPDATA%\ApolloProfileManager\` so it persists
 | Path | Contents |
 |---|---|
 | `config.ini` | Apollo config path and optional settings overrides |
-| `profiles\<app-uuid>\` | Per-game profile data and tracked-path list |
-| `profiles\<app-uuid>\<client-uuid>\` | Per-client saved files/folders |
+| `profiles\<app-uuid>\` | Per-game profile data and tracked item list |
+| `profiles\<app-uuid>\<client-uuid>\` | Per-client saved files/folders and registry exports |
 | `logs\manager-YYYY-MM-DD.log` | Daily log file (all console output with timestamps) |
 
 ## Prerequisites

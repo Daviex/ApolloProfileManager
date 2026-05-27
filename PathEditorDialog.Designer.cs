@@ -20,6 +20,7 @@ partial class PathEditorDialog
         pnlButtons  = new System.Windows.Forms.Panel();
         btnAddDir   = new System.Windows.Forms.Button();
         btnAddFile  = new System.Windows.Forms.Button();
+        btnAddRegistry = new System.Windows.Forms.Button();
         btnRemove   = new System.Windows.Forms.Button();
         btnClose    = new System.Windows.Forms.Button();
         grpPaths.SuspendLayout();
@@ -54,6 +55,7 @@ partial class PathEditorDialog
         //
         pnlButtons.Controls.Add(btnAddDir);
         pnlButtons.Controls.Add(btnAddFile);
+        pnlButtons.Controls.Add(btnAddRegistry);
         pnlButtons.Controls.Add(btnRemove);
         pnlButtons.Controls.Add(btnClose);
         pnlButtons.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -82,12 +84,22 @@ partial class PathEditorDialog
         btnAddFile.UseVisualStyleBackColor = true;
         btnAddFile.Click += BtnAddFile_Click;
         //
+        // btnAddRegistry
+        //
+        btnAddRegistry.Location = new System.Drawing.Point(175, 8);
+        btnAddRegistry.Name = "btnAddRegistry";
+        btnAddRegistry.Size = new System.Drawing.Size(90, 28);
+        btnAddRegistry.TabIndex = 2;
+        btnAddRegistry.Text = "Add registry";
+        btnAddRegistry.UseVisualStyleBackColor = true;
+        btnAddRegistry.Click += BtnAddRegistry_Click;
+        //
         // btnRemove
         //
-        btnRemove.Location = new System.Drawing.Point(175, 8);
+        btnRemove.Location = new System.Drawing.Point(270, 8);
         btnRemove.Name = "btnRemove";
         btnRemove.Size = new System.Drawing.Size(80, 28);
-        btnRemove.TabIndex = 2;
+        btnRemove.TabIndex = 3;
         btnRemove.Text = "Remove";
         btnRemove.UseVisualStyleBackColor = true;
         btnRemove.Click += BtnRemove_Click;
@@ -98,7 +110,7 @@ partial class PathEditorDialog
         btnClose.Location = new System.Drawing.Point(399, 8);
         btnClose.Name = "btnClose";
         btnClose.Size = new System.Drawing.Size(80, 28);
-        btnClose.TabIndex = 3;
+        btnClose.TabIndex = 4;
         btnClose.Text = "Close";
         btnClose.UseVisualStyleBackColor = true;
         btnClose.Click += BtnClose_Click;
@@ -126,6 +138,7 @@ partial class PathEditorDialog
     private System.Windows.Forms.Panel pnlButtons;
     private System.Windows.Forms.Button btnAddDir;
     private System.Windows.Forms.Button btnAddFile;
+    private System.Windows.Forms.Button btnAddRegistry;
     private System.Windows.Forms.Button btnRemove;
     private System.Windows.Forms.Button btnClose;
 }
